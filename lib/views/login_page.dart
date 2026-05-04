@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tugas_resep/views/home_view.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tugas_resep/views/home_page.dart';
+import 'package:tugas_resep/views/registration_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -14,11 +16,16 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _isPasswordVisible = false;
 
-  void _login() {
+  void _login() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
     String username = _usernameController.text;
     String password = _passwordController.text;
+    String? savedUsername = prefs.getString("username");
+    String? savedPassword = prefs.getString("password");
 
-    if (username == "maan" && password == "maan") {
+    if (username == savedUsername && password == savedPassword) {
+      await prefs.setBool('isLoggedIn', true);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
@@ -73,12 +80,13 @@ class _LoginPageState extends State<LoginPage> {
                   _usernameController,
                   Icon(Icons.person, color: Colors.orange),
                   null,
+                  _isPasswordVisible,
                 ),
                 SizedBox(height: 20),
                 Text("Password"),
                 _inputField(
                   "Password",
-                  _isPasswordVisible ? true : false,
+                  true,
                   _passwordController,
                   Icon(Icons.lock, color: Colors.orange),
                   IconButton(
@@ -91,6 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                         ? Icon(Icons.visibility)
                         : Icon(Icons.visibility_off),
                   ),
+                  _isPasswordVisible,
                 ),
                 SizedBox(height: 20),
                 ElevatedButton(
@@ -114,11 +123,21 @@ class _LoginPageState extends State<LoginPage> {
                       style: TextStyle(color: Colors.blueGrey),
                     ),
                     SizedBox(width: 3),
-                    Text(
-                      "Daftar",
-                      style: TextStyle(
-                        color: Colors.orange,
-                        fontWeight: FontWeight.bold,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => RegistrationPage(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        "Daftar",
+                        style: TextStyle(
+                          color: Colors.orange,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                   ],
@@ -138,10 +157,11 @@ Widget _inputField(
   TextEditingController controller,
   Icon prefixIcon,
   IconButton? suffixIcon,
+  bool isVisible,
 ) {
   return TextField(
     controller: controller,
-    obscureText: obscureText,
+    obscureText: obscureText ? !isVisible : false,
     decoration: InputDecoration(
       prefixIcon: prefixIcon,
       suffixIcon: suffixIcon,

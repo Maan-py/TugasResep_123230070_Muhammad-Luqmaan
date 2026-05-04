@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tugas_resep/views/login_view.dart';
+import 'package:tugas_resep/views/login_page.dart';
 
 void main() {
   runApp(const MainApp());
