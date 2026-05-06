@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tugas_resep/models/meal.dart';
 import 'package:tugas_resep/services/api_service.dart';
 import 'package:tugas_resep/views/login_page.dart';
@@ -56,6 +55,10 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> pages = [
+      HomePageContent(isLoading: isLoading, meals: meals),
+      Center(child: Text("Favorite")),
+    ];
     return Scaffold(
       appBar: AppBar(
         title: Text("Resepku"),
@@ -63,49 +66,7 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: Colors.orange,
         foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Resep Chicken",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 16),
-            isLoading
-                ? Expanded(child: Center(child: CircularProgressIndicator()))
-                : Expanded(
-                    child: GridView.builder(
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 10,
-                        mainAxisSpacing: 10,
-                        childAspectRatio: 0.8,
-                      ),
-                      itemCount: meals.length,
-                      itemBuilder: (context, index) {
-                        final meal = meals[index];
-
-                        return Card(
-                          child: Column(
-                            children: [
-                              Image.network(meal.image),
-                              SizedBox(height: 8),
-                              Text(
-                                meal.name,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.left,
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-          ],
-        ),
-      ),
+      body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         // backgroundColor: Colors.white,
         currentIndex: _selectedIndex,
@@ -126,6 +87,63 @@ class _HomePageState extends State<HomePage> {
             activeIcon: Icon(Icons.favorite),
             label: "Favorite",
           ),
+        ],
+      ),
+    );
+  }
+}
+
+class HomePageContent extends StatelessWidget {
+  final bool isLoading;
+  final List<Meal> meals;
+  const HomePageContent({
+    super.key,
+    required this.isLoading,
+    required this.meals,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Resep Chicken",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 16),
+          isLoading
+              ? Expanded(child: Center(child: CircularProgressIndicator()))
+              : Expanded(
+                  child: GridView.builder(
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 10,
+                      mainAxisSpacing: 10,
+                      childAspectRatio: 0.8,
+                    ),
+                    itemCount: meals.length,
+                    itemBuilder: (context, index) {
+                      final meal = meals[index];
+
+                      return Card(
+                        child: Column(
+                          children: [
+                            Image.network(meal.image),
+                            SizedBox(height: 8),
+                            Text(
+                              meal.name,
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                              textAlign: TextAlign.left,
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ),
         ],
       ),
     );
