@@ -26,6 +26,7 @@ class _LoginPageState extends State<LoginPage> {
 
     if (username == savedUsername && password == savedPassword) {
       await prefs.setBool('isLoggedIn', true);
+      await prefs.setString('username', username);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
