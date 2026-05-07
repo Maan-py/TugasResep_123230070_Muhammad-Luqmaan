@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:tugas_resep/models/favorite_meal.dart';
 import 'package:tugas_resep/models/meal.dart';
 import 'package:tugas_resep/services/api_service.dart';
 import 'package:tugas_resep/views/detail_page.dart';
@@ -58,7 +60,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final List<Widget> pages = [
       HomePageContent(isLoading: isLoading, meals: meals),
-      Center(child: Text("Favorite")),
+      FavoritePage(),
     ];
     return Scaffold(
       appBar: AppBar(
@@ -97,6 +99,7 @@ class _HomePageState extends State<HomePage> {
 class HomePageContent extends StatelessWidget {
   final bool isLoading;
   final List<Meal> meals;
+
   const HomePageContent({
     super.key,
     required this.isLoading,
@@ -159,6 +162,99 @@ class HomePageContent extends StatelessWidget {
                     },
                   ),
                 ),
+        ],
+      ),
+    );
+  }
+}
+
+class FavoritePage extends StatelessWidget {
+  const FavoritePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final box = Hive.box<FavoriteMeal>("favorite_meals");
+
+    return Padding(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Favorite Saya",
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          SizedBox(height: 16),
+          Expanded(
+            child: ValueListenableBuilder<Box<FavoriteMeal>>(
+              valueListenable: box.listenable(),
+              builder: (context, box, _) {
+                final favoriteMeals = box.values.toList();
+
+                if (favoriteMeals.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "Belum ada resep favorit.",
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  );
+                }
+
+                return GridView.builder(
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 10,
+                    mainAxisSpacing: 10,
+                    childAspectRatio: 0.8,
+                  ),
+                  itemCount: favoriteMeals.length,
+                  itemBuilder: (context, index) {
+                    final meal = favoriteMeals[index];
+
+                    return InkWell(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailPage(mealId: meal.id),
+                          ),
+                        );
+                      },
+                      child: Card(
+                        clipBehavior: Clip.antiAlias,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                        ),
+                        child: Column(
+                          children: [
+                            Expanded(
+                              child: Image.network(
+                                meal.image,
+                                fit: BoxFit.cover,
+                                width: double.infinity,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 8),
+                              child: Text(
+                                meal.name,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.center,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

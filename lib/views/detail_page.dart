@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tugas_resep/models/favorite_meal.dart';
 import 'package:tugas_resep/services/api_service.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class DetailPage extends StatefulWidget {
   final String mealId;
@@ -12,6 +14,8 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   Map<String, dynamic> mealDetail = {};
   bool isLoading = true;
+
+  Box<FavoriteMeal> box = Hive.box<FavoriteMeal>("favorite_meals");
 
   @override
   void initState() {
@@ -34,6 +38,27 @@ class _DetailPageState extends State<DetailPage> {
         isLoading = false;
       });
     }
+  }
+
+  bool checkStatus(String mealId) {
+    return box.containsKey(mealId);
+  }
+
+  void toggleFavorite(String mealId) {
+    setState(() {
+      if (checkStatus(mealId)) {
+        box.delete(mealId);
+      } else {
+        box.put(
+          mealId,
+          FavoriteMeal(
+            id: mealDetail["idMeal"],
+            name: mealDetail["strMeal"],
+            image: mealDetail["strMealThumb"],
+          ),
+        );
+      }
+    });
   }
 
   @override
@@ -95,15 +120,21 @@ class _DetailPageState extends State<DetailPage> {
                         SizedBox(height: 15),
                         Center(
                           child: ElevatedButton.icon(
-                            onPressed: () {},
+                            onPressed: () {
+                              toggleFavorite(mealDetail["idMeal"]);
+                            },
                             icon: Icon(Icons.favorite, color: Colors.white),
                             label: Text(
-                              "Tambah ke Favorite",
+                              checkStatus(mealDetail["idMeal"])
+                                  ? "Hapus dari Favorite"
+                                  : "Tambah ke Favorite",
                               style: TextStyle(color: Colors.white),
                             ),
                             style: ElevatedButton.styleFrom(
                               minimumSize: Size(double.infinity, 50),
-                              backgroundColor: Colors.orange,
+                              backgroundColor: checkStatus(mealDetail["idMeal"])
+                                  ? Colors.red
+                                  : Colors.orange,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),

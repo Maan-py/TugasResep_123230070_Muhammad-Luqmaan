@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:tugas_resep/models/favorite_meal.dart';
 import 'package:tugas_resep/views/login_page.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding();
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(FavoriteMealAdapter());
+  await Hive.openBox<FavoriteMeal>("favorite_meals");
   runApp(const MainApp());
 }
 
