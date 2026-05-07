@@ -225,27 +225,48 @@ class FavoritePage extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
-                        child: Column(
+                        child: Stack(
                           children: [
-                            Expanded(
-                              child: Image.network(
-                                meal.image,
-                                fit: BoxFit.cover,
-                                width: double.infinity,
+                            Column(
+                              children: [
+                                Expanded(
+                                  child: Image.network(
+                                    meal.image,
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                                Padding(
+                                  padding: EdgeInsets.symmetric(horizontal: 8),
+                                  child: Text(
+                                    meal.name,
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                SizedBox(height: 8),
+                              ],
+                            ),
+                            Positioned(
+                              top: 4,
+                              right: 4,
+                              child: IconButton(
+                                onPressed: () {
+                                  box.delete(meal.id);
+                                },
+                                icon: Icon(Icons.close, color: Colors.red),
+                                tooltip: "Hapus favorit",
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.red,
+                                ),
                               ),
                             ),
-                            SizedBox(height: 8),
-                            Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 8),
-                              child: Text(
-                                meal.name,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                                textAlign: TextAlign.center,
-                                maxLines: 2,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            SizedBox(height: 8),
                           ],
                         ),
                       ),

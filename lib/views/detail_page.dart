@@ -44,19 +44,31 @@ class _DetailPageState extends State<DetailPage> {
     return box.containsKey(mealId);
   }
 
+  void deleteFavorite(String mealId) {
+    setState(() {
+      box.delete(mealId);
+    });
+  }
+
+  void addFavorite(String mealId) {
+    setState(() {
+      box.put(
+        mealId,
+        FavoriteMeal(
+          id: mealDetail["idMeal"],
+          name: mealDetail["strMeal"],
+          image: mealDetail["strMealThumb"],
+        ),
+      );
+    });
+  }
+
   void toggleFavorite(String mealId) {
     setState(() {
       if (checkStatus(mealId)) {
-        box.delete(mealId);
+        deleteFavorite(mealId);
       } else {
-        box.put(
-          mealId,
-          FavoriteMeal(
-            id: mealDetail["idMeal"],
-            name: mealDetail["strMeal"],
-            image: mealDetail["strMealThumb"],
-          ),
-        );
+        addFavorite(mealId);
       }
     });
   }
