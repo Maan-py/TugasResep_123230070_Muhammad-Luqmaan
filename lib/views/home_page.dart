@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tugas_resep/models/meal.dart';
 import 'package:tugas_resep/services/api_service.dart';
+import 'package:tugas_resep/views/detail_page.dart';
 import 'package:tugas_resep/views/login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,6 +16,12 @@ class _HomePageState extends State<HomePage> {
 
   List<Meal> meals = [];
   bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchMeals();
+  }
 
   Future<void> fetchMeals() async {
     try {
@@ -48,12 +55,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    fetchMeals();
-  }
-
-  @override
   Widget build(BuildContext context) {
     final List<Widget> pages = [
       HomePageContent(isLoading: isLoading, meals: meals),
@@ -61,7 +62,7 @@ class _HomePageState extends State<HomePage> {
     ];
     return Scaffold(
       appBar: AppBar(
-        title: Text("Resepku"),
+        title: Text("Resepku", style: TextStyle(fontWeight: FontWeight.bold)),
         actions: [IconButton(onPressed: _logout, icon: Icon(Icons.logout))],
         backgroundColor: Colors.orange,
         foregroundColor: Colors.white,
@@ -128,17 +129,31 @@ class HomePageContent extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final meal = meals[index];
 
-                      return Card(
-                        child: Column(
-                          children: [
-                            Image.network(meal.image),
-                            SizedBox(height: 8),
-                            Text(
-                              meal.name,
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                              textAlign: TextAlign.left,
+                      return InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DetailPage(mealId: meal.id),
                             ),
-                          ],
+                          );
+                        },
+                        child: Card(
+                          clipBehavior: Clip.antiAlias,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: Column(
+                            children: [
+                              Image.network(meal.image),
+                              SizedBox(height: 8),
+                              Text(
+                                meal.name,
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                                textAlign: TextAlign.left,
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },

@@ -19,4 +19,19 @@ class ApiService {
       throw Exception("Failed to get meals");
     }
   }
+
+  static Future<Map<String, dynamic>> getMealDetail(String id) async {
+    String apiDetailUrl =
+        "https://www.themealdb.com/api/json/v1/1/lookup.php?i=$id";
+
+    final response = await http.get(Uri.parse(apiDetailUrl));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      return data["meals"][0];
+    } else {
+      throw Exception("Failed to get meal detail");
+    }
+  }
 }
